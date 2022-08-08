@@ -2,13 +2,11 @@
 
 namespace basics;
 
-use InvalidArgumentException;
-
 class Basics implements BasicsInterface
 {
     private BasicsValidator $validator;
     
-    public function __construct($validator)
+    public function __construct(BasicsValidator $validator)
     {
         $this->validator = $validator;
     }

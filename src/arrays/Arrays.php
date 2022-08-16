@@ -4,7 +4,6 @@ namespace arrays;
 
 class Arrays implements ArraysInterface
 {
-    
     /**
      * @inheritDoc
      */
@@ -12,10 +11,8 @@ class Arrays implements ArraysInterface
     {
         $output = [];
         
-        foreach ($input as $item) {
-            for ($i = 0; $i < $item; $i++) {
-                $output[] = $item;
-            }
+        foreach ($input as $value) {
+            $output = array_merge($output, array_fill(0, $value, $value));
         }
         
         return $output;

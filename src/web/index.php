@@ -10,6 +10,14 @@ $airports = require './airports.php';
  * (see Filtering tasks 1 and 2 below)
  */
 
+if (isset($_GET['filter_by_first_letter'])) {
+    $airports = filterByFirstLetter($airports, $_GET['filter_by_first_letter']);
+}
+
+if (isset($_GET['filter_by_state'])) {
+    $airports = filterByState($airports, $_GET['filter_by_state']);
+}
+
 // Sorting
 /**
  * Here you need to check $_GET request if it has sorting key
@@ -17,12 +25,30 @@ $airports = require './airports.php';
  * (see Sorting task below)
  */
 
+if (isset($_GET['sort'])) {
+    sortByField($airports, $_GET['sort']);
+}
+
 // Pagination
 /**
  * Here you need to check $_GET request if it has pagination key
  * and apply pagination logic
  * (see Pagination task below)
  */
+
+const LIMIT_PER_PAGE = 5;
+
+$totalPages = ceil(count($airports) / LIMIT_PER_PAGE);
+$currentPage = $_GET['page'] ?? 1;
+
+// Start number of pagination button
+$firstPageNumber = max($currentPage - 3, 1);
+// Last number of pagination button
+$lastPageNumber = min($currentPage + 4, $totalPages);
+
+// Get airports per page
+$airports = array_slice($airports, ($currentPage - 1) * LIMIT_PER_PAGE, LIMIT_PER_PAGE);
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -53,10 +79,11 @@ $airports = require './airports.php';
         Filter by first letter:
 
         <?php foreach (getUniqueFirstLetters(require './airports.php') as $letter): ?>
-            <a href="#"><?= $letter ?></a>
+            <a href="<?= applyParams(['filter_by_first_letter' => $letter], ['page' => 1]); ?>">
+                <?= $letter ?></a>
         <?php endforeach; ?>
 
-        <a href="/" class="float-right">Reset all filters</a>
+        <a href="<?= parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>" class="float-right">Reset all filters</a>
     </div>
 
     <!--
@@ -72,10 +99,10 @@ $airports = require './airports.php';
     <table class="table">
         <thead>
         <tr>
-            <th scope="col"><a href="#">Name</a></th>
-            <th scope="col"><a href="#">Code</a></th>
-            <th scope="col"><a href="#">State</a></th>
-            <th scope="col"><a href="#">City</a></th>
+            <th scope="col"><a href="<?= applyParams(['sort' => 'name']) ?>">Name</a></th>
+            <th scope="col"><a href="<?= applyParams(['sort' => 'code']) ?>">Code</a></th>
+            <th scope="col"><a href="<?= applyParams(['sort' => 'state']) ?>">State</a></th>
+            <th scope="col"><a href="<?= applyParams(['sort' => 'city']) ?>">City</a></th>
             <th scope="col">Address</th>
             <th scope="col">Timezone</th>
         </tr>
@@ -95,7 +122,8 @@ $airports = require './airports.php';
         <tr>
             <td><?= $airport['name'] ?></td>
             <td><?= $airport['code'] ?></td>
-            <td><a href="#"><?= $airport['state'] ?></a></td>
+            <td><a href="<?= applyParams(['filter_by_state' => $airport['state']], ['page' => 1]); ?>">
+                    <?= $airport['state'] ?></a></td>
             <td><?= $airport['city'] ?></td>
             <td><?= $airport['address'] ?></td>
             <td><?= $airport['timezone'] ?></td>
@@ -115,9 +143,11 @@ $airports = require './airports.php';
     -->
     <nav aria-label="Navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <?php for ($i = $firstPageNumber; $i < $lastPageNumber; $i++): ?>
+                <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                    <a class="page-link" href="<?= applyParams(['page' => $i]) ?>"><?= $i ?></a>
+                </li>
+            <?php endfor; ?>
         </ul>
     </nav>
 

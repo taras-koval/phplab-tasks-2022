@@ -143,7 +143,7 @@ $airports = array_slice($airports, ($currentPage - 1) * LIMIT_PER_PAGE, LIMIT_PE
     -->
     <nav aria-label="Navigation">
         <ul class="pagination justify-content-center">
-            <?php for ($i = $firstPageNumber; $i < $lastPageNumber; $i++): ?>
+            <?php for ($i = $firstPageNumber; $i <= $lastPageNumber; $i++): ?>
                 <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
                     <a class="page-link" href="<?= applyParams(['page' => $i]) ?>"><?= $i ?></a>
                 </li>
